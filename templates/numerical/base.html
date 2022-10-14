@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name='viewport' content='width=device-width, intitial-scale=1.0'>
+        <title>Numerical Reasoning</title>
+        <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    
+        <style>
+
+            html{
+                caret-color: transparent;
+            }
+            .stats-grid{
+                font-size: 1rem;
+				display:grid;
+				grid-template-columns: auto 15% 15% 15% 15%  ;
+				height: min-content;
+				text-align: center;
+			}
+
+            @media only screen and (max-width: 660px) {
+                .stats-grid{
+                    display:grid;
+                    grid-template-columns: auto;
+                    height: min-content;
+                    text-align: center;
+                    }
+                }
+
+			.stats-item{
+			}
+            .diagram{
+                text-align: center;
+            }
+            .description{
+                text-align: center;
+            }
+            .question-grid{
+                display:grid;
+                grid-template-columns: 15% auto 15%;
+            }
+            #slide-left{
+                display:none;
+            }
+            #slide-right{
+                display:block;
+            }
+            .slide{
+                margin:2%;
+                padding:2%;
+                border-radius:4px;
+            }
+            .slide:hover{
+                
+            }
+            .button{
+                background:rgb(0, 60, 255);
+                color:white;
+                text-align: center;
+                border-radius: 4px;
+                caret-color: transparent;
+                transition:0.25s;
+            }
+            .button:hover{
+                background:blue;
+                color:white;
+                cursor:pointer;
+                transition:0.25s;
+            }
+            
+            .question-container{
+                margin-top:2%;
+                margin-bottom:2%;
+                margin-left:2%;
+                margin-right:2%;
+            }
+            #question1-container{
+                display:block;
+            }
+            #question2-container{
+                display:none;
+            }
+            #question3-container{
+                display:none;
+            }
+            #question4-container{
+                display:none;
+            }
+            #question5-container{
+                display:none;
+            }
+            .items{
+                display:grid;
+                grid-template-columns: 20% 20% 20% 20% 20%;
+                text-align: center;
+                
+            }
+            .multi-item{
+                color:black;
+                background:white;
+                margin:1%;
+                padding:2%;
+                transition:0.25s;
+            }
+            
+            .selected{
+                background:green;
+                color:white;
+            }
+            .submit{
+                width:10%;
+                padding:1%;
+                margin-left:auto;
+                margin-right:auto;
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <div class="main">
+            <div class="header">
+
+            </div>
+            <div class="main-content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </body>
+</html>

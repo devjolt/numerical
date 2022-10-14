@@ -1,0 +1,293 @@
+{% extends 'numerical/base.html' %}
+
+{% block content %}
+<script>
+
+var start = Date.now()    
+
+    if (getCookie("time") != ''){//if cookie for timing exists
+        var sec = Number(getCookie('time'));//use that as value from which to count up
+    } else {
+        var sec = 0;//start from zero
+    }
+
+    // total_correct cookie stores two integers separated by a comma
+    if (getCookie("total_correct") != ''){//if cookie exists
+        var total, correct;
+        [total, correct] = getCookie("total_correct").split(",")
+        total = parseInt(total);
+        correct = parseInt(correct);
+    } else {
+        var total = 0, correct = 0 //start from zero
+    }
+    var percentage = correct / total * 100;
+    var time = sec;
+    
+
+    //var sec = 0;
+    function pad ( val ) { return val > 9 ? val : "0" + val; }
+    setInterval( function(){
+        document.getElementById("seconds").innerHTML=pad(++sec%60);
+        document.getElementById("minutes").innerHTML=pad(parseInt(sec/60,10));
+    }, 1000);
+    
+    function getCookie(cname) {
+      var name = cname + "=";
+      var ca = document.cookie.split(';');
+      for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+
+</script>
+
+
+<div class='stats-grid'>
+    
+    <div class='reset button' onclick=reset()>Reset stats</div>
+       
+    <div class = 'timer'>
+        <span id="minutes"></span>:<span id="seconds"></span>
+    </div>
+    <div class='stats-item'>
+        <div class = 'ratio'>
+            <span id="correct"></span>/<span id="total"></span> correct
+        </div>
+    </div>
+    <div class='stats-item'>
+        <div class = 'percent'>
+            <span id="percent"></span> %
+        </div>
+    </div>
+    <div class='stats-item'>
+        <div class = 'speed'>
+            <span id="speed"></span> seconds / mark
+        </div>
+    </div>
+</div>
+
+<div class="diagram">
+    <img src='data:image/png;base64,{{ diagram }}'>
+</div>
+
+<div class="description">
+    {{ description }}
+</div>
+
+<div class="question-grid">
+    <div class="slide">
+        <div id="slide-left" class="slide button" onclick="slide('left')">Previous</div>
+    </div>
+    <div class="question-container">
+        <div id="question1-container">
+            <div class="question">
+                Question 1/5:</br>
+                {{question0}}
+            </div>
+            </br>
+            <div id="items0" class="items">
+                {% for thing in items0 %}
+                <div class='multi-item {{thing.indicator}} button' id='{{thing.id}}' onclick = "multiChoiceSubmit('{{thing.indicator}}','{{thing.id}}')">
+                    {{thing.item}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="question2-container">
+            <div class="question">
+                Question 2/5:</br>
+                {{question1}}
+            </div>
+            </br>
+            <div id="items1" class="items">    
+                {% for thing in items1 %}
+                <div class='multi-item {{thing.indicator}} button' id='{{thing.id}}' onclick = "multiChoiceSubmit('{{thing.indicator}}','{{thing.id}}')">
+                    {{thing.item}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="question3-container">
+            <div class="question">
+                Question 3/5:</br>
+                {{question2}}
+            </div>
+            </br>
+            <div id="items2" class="items">    
+                {% for thing in items2 %}
+                <div class='multi-item {{thing.indicator}} button' id='{{thing.id}}' onclick = "multiChoiceSubmit('{{thing.indicator}}','{{thing.id}}')">
+                    {{thing.item}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="question4-container">
+            <div class="question">
+                Question 4/5:</br>
+                {{question3}}
+            </div>
+            </br>
+            <div id="items3" class="items">    
+                {% for thing in items3 %}
+                <div class='multi-item {{thing.indicator}} button' id='{{thing.id}}' onclick = "multiChoiceSubmit('{{thing.indicator}}','{{thing.id}}')">
+                    {{thing.item}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="question5-container">
+            <div class="question">
+                Question 5/5:</br>
+                {{question4}}
+            </div>
+            </br>
+            <div id="items4" class="items">    
+                {% for thing in items4 %}
+                <div class='multi-item {{thing.indicator}} button' id='{{thing.id}}' onclick = "multiChoiceSubmit('{{thing.indicator}}','{{thing.id}}')">
+                    {{thing.item}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="slide">
+        <div id="slide-right" class="slide button" onclick="slide('right')">Next</div>
+    </div>
+</div>
+
+<div class="submit button" onclick="submit()">Submit</div>
+
+<script>
+//populate dash
+try{
+    document.getElementById('correct').innerHTML = correct.toString();
+} catch(err){
+    document.getElementById('correct').innerHTML = '0';
+}
+try{
+    document.getElementById('total').innerHTML = total.toString();
+} catch(err){
+    document.getElementById('total').innerHTML = '0';
+}
+try{
+    document.getElementById('speed').innerHTML = Math.round((time / correct)*10)/10;
+} catch(err){
+    document.getElementById('speed').innerHTML = '0';
+}
+try{
+    document.getElementById('percent').innerHTML = Math.round(correct/total*100)
+} catch(err){
+    document.getElementById('percent').innerHTML = '0';
+}
+
+
+var questionContainerArray = [
+    "question1-container",
+    "question2-container",
+    "question3-container",
+    "question4-container",
+    "question5-container"
+]
+var currentQuestionContainer = 0
+
+function slide(direction){
+    if (direction=='left'){
+        var end = 0
+        var add = -1
+    }else{
+        var end = 4
+        var add = 1
+    }
+
+    if (currentQuestionContainer!=end){
+        currentQuestionContainer+=add
+
+        for (const container in questionContainerArray){
+            if (container==currentQuestionContainer){
+                document.getElementById(questionContainerArray[container]).style.display = 'block';
+            }else{
+                document.getElementById(questionContainerArray[container]).style.display = 'none';
+            }       
+        }
+    }
+
+    if (currentQuestionContainer==0){
+        document.getElementById('slide-left').style.display = 'none';    
+    }else if(currentQuestionContainer==4){
+        document.getElementById('slide-right').style.display = 'none';
+    }else{
+        document.getElementById('slide-left').style.display = 'block';
+        document.getElementById('slide-right').style.display = 'block';
+    }
+    console.log(currentQuestionContainer, end, add)
+}
+
+var questionAnswers = {
+    '0':0,
+    '1':0,
+    '2':0,
+    '3':0,
+    '4':0,
+}
+
+function multiChoiceSubmit(indicator, elementId){
+    question = elementId[0]
+    if(indicator=='correct'){
+        questionAnswers[question] = 1
+    }else{
+        questionAnswers[question] = 0
+    }
+    document.getElementById(elementId).classList.add('selected')
+    // get all items inside container
+    children = document.getElementById(elementId).parentNode.childNodes
+    console.log('children', children)
+    var ids = ['a','b','c','d','e']
+    for (elemId in ids){
+        if (question+ids[elemId]!= elementId){
+            document.getElementById(question+ids[elemId]).classList.remove('selected')
+        }
+    }
+}
+
+function submit(){
+    
+    for(const question in questionAnswers){
+        correct+=questionAnswers[question]
+    }
+    total+=5;
+    updateTotalCorrectCookie()//increment cookies
+    var end = Date.now();
+
+    var str_sec = sec.toString();
+    var cookie_str = "time=" + str_sec;
+    document.cookie = cookie_str;
+    console.log(correct)
+    location.reload();
+}
+
+function updateTotalCorrectCookie(){
+    //console.log([total,correct].toString())
+    document.cookie = "total_correct=" + [total,correct].toString();
+}
+
+function reset(){
+    document.getElementById('seconds').innerHTML = 0;
+    document.getElementById('minutes').innerHTML = 0;
+    document.getElementById('correct').innerHTML = 0;
+    document.getElementById('total').innerHTML = 0;
+    document.getElementById('speed').innerHTML = 0;
+
+    document.cookie = "time=0";
+    document.cookie = "total_correct=0,0"
+    location.reload();
+}
+</script>
+
+{% endblock %}
